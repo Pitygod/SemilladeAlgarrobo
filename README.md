@@ -3,9 +3,9 @@
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate          # Windows  (Linux/Mac: source .venv/bin/activate)
+.venv\Scripts\activate          
 pip install -r requirements.txt
-copy .env.example .env          # Linux/Mac: cp .env.example .env  → completar valores
+copy .env.example .env        
 python manage.py migrate
 python manage.py runserver
 ```
