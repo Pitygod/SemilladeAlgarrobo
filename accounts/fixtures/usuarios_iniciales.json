@@ -1,0 +1,62 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$SC8RQPTRZ3i5gOBHJPusVx$QwElOBpw9vMFDFjqLbIQ7d2Zw6MoeGw5upsCWQjhIy4=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin@comunidades.org",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@comunidades.org",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-06-29 18:24:27.310913",
+      "display_name": "Administrador",
+      "account_type": "donante",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$sVc92z5EdbxlrQlgndEme1$bazvzjvHScU/NGWLHQJEW2oFZ6BcR5TXk4iVNAEBezM=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "maria.gonzalez@email.com",
+      "first_name": "",
+      "last_name": "",
+      "email": "maria.gonzalez@email.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-06-29 18:24:28.477173",
+      "display_name": "María González",
+      "account_type": "donante",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$mPsFPyooA6glFMBeKPQzMd$LOcoNRSSIU5UnjgZD+WaYqjU+bdyo8ZyzAlm4vabbvA=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "inti@comunidad.org",
+      "first_name": "",
+      "last_name": "",
+      "email": "inti@comunidad.org",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-06-29 18:24:28.481349",
+      "display_name": "inti",
+      "account_type": "comunidad",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

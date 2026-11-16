@@ -1,0 +1,18 @@
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+
+import config.admin  # noqa: F401  (personaliza títulos del admin)
+from communities.views import home
+
+urlpatterns = [
+    path('', home, name='home'),
+    path('admin/', admin.site.urls),
+    path('', include('accounts.urls')),
+    path('comunidades/', include('communities.urls')),
+    path('donar/', include('donations.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

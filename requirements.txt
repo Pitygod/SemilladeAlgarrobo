@@ -1,0 +1,5 @@
+Django>=5.2,<6.0
+Pillow>=10.0
+# SDK oficial de Mercado Pago (incluye Orders API, suscripciones y validador de webhooks)
+mercadopago>=3.6.0,<4
+python-dotenv>=1.0
