@@ -1,0 +1,63 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Estado de tu donación - {{ SITE_NAME }}{% endblock %}
+
+{% block extra_css %}
+{# Mientras el pago no tenga un estado final, la página vuelve a consultar a Mercado Pago. #}
+{% if donation.status == 'pendiente' or donation.status == 'en_proceso' %}<meta http-equiv="refresh" content="20">{% endif %}
+{% endblock %}
+
+{% block content %}
+<main class="page-content page-narrow">
+    {% with s=donation.status %}
+    <section class="result-card result-{{ s }}" aria-live="polite">
+        <div class="result-icon" aria-hidden="true">
+            {% if s == 'aprobada' %}✓{% elif s == 'pendiente' or s == 'en_proceso' %}…{% elif s == 'reembolsada' or s == 'reembolso_parcial' %}↺{% else %}✕{% endif %}
+        </div>
+        <h1>
+            {% if s == 'aprobada' %}DONACIÓN APROBADA
+            {% elif s == 'pendiente' %}DONACIÓN PENDIENTE
+            {% elif s == 'en_proceso' %}DONACIÓN EN PROCESO
+            {% elif s == 'rechazada' %}DONACIÓN RECHAZADA
+            {% elif s == 'cancelada' %}DONACIÓN CANCELADA
+            {% elif s == 'vencida' %}DONACIÓN VENCIDA
+            {% elif s == 'reembolsada' %}DONACIÓN REEMBOLSADA
+            {% elif s == 'reembolso_parcial' %}DONACIÓN REEMBOLSADA PARCIALMENTE
+            {% else %}NO SE PUDO INICIAR EL PAGO{% endif %}
+        </h1>
+        <p class="result-message">
+            {% if s == 'aprobada' %}¡Gracias! Mercado Pago confirmó tu aporte.
+            {% elif s == 'pendiente' %}Todavía no recibimos la confirmación del pago. Si pagaste en efectivo o por transferencia, puede demorar. Esta página se actualiza sola.
+            {% elif s == 'en_proceso' %}Mercado Pago está revisando el pago. Te avisaremos el resultado acá y en "Mi actividad".
+            {% elif s == 'rechazada' %}El pago no fue aprobado. Podés intentarlo de nuevo con otro medio de pago.
+            {% elif s == 'cancelada' or s == 'vencida' %}El pago no se completó.
+            {% elif s == 'error' %}Hubo un problema al conectar con Mercado Pago. No se realizó ningún cobro.
+            {% else %}El estado de esta donación cambió.{% endif %}
+        </p>
+
+        <dl class="detail-list">
+            <div><dt>Importe</dt><dd>${{ donation.amount|floatformat:0|intcomma }} {{ donation.currency }}</dd></div>
+            <div><dt>Fecha</dt><dd>{{ donation.created_at|date:"d/m/Y H:i" }}</dd></div>
+            {% if donation.community %}<div><dt>Comunidad</dt><dd>{{ donation.community.name }}</dd></div>{% endif %}
+            {% if donation.need %}<div><dt>Necesidad</dt><dd>{{ donation.need.title }}</dd></div>{% endif %}
+            <div><dt>Referencia</dt><dd><code>{{ donation.short_reference }}</code></dd></div>
+            {% if donation.mp_order_id %}<div><dt>Operación Mercado Pago</dt><dd><code>{{ donation.mp_order_id }}</code></dd></div>{% endif %}
+            {% if donation.payment_method %}<div><dt>Medio de pago</dt><dd>{{ donation.payment_method }}{% if donation.payment_type %} ({{ donation.payment_type }}){% endif %}</dd></div>{% endif %}
+            {% if donation.last_synced_at %}<div><dt>Verificado con Mercado Pago</dt><dd>{{ donation.last_synced_at|date:"d/m/Y H:i" }}</dd></div>{% endif %}
+        </dl>
+
+        <div class="result-actions">
+            {% if s == 'rechazada' or s == 'cancelada' or s == 'vencida' or s == 'error' %}
+            <a href="{% url 'donations:one_time' %}{% if donation.need_id %}?necesidad={{ donation.need_id }}{% elif donation.community_id %}?comunidad={{ donation.community_id }}{% endif %}" class="btn btn-brand">Intentar de nuevo</a>
+            {% endif %}
+            {% if s == 'pendiente' and donation.checkout_url %}
+            <a href="{{ donation.checkout_url }}" class="btn btn-outline">Volver a Mercado Pago</a>
+            {% endif %}
+            <a href="{% url 'donations:my_activity' %}" class="btn btn-primary">Ver mi actividad solidaria</a>
+            {% if donation.community %}<a href="{% url 'communities:detail' donation.community_id %}" class="btn btn-secondary">Volver a la comunidad</a>{% endif %}
+        </div>
+    </section>
+    {% endwith %}
+</main>
+{% endblock %}

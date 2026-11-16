@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<a href="#contenido" class="skip-link">Saltar al contenido</a>
+<header class="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-left">
+            <a href="{% url 'home' %}" class="brand">
+                <span class="brand-icon" aria-hidden="true">♥</span>
+                {{ SITE_NAME }}
+            </a>
+            <nav class="nav-links" aria-label="Principal">
+                {% with current=request.resolver_match.url_name %}
+                <a href="{% url 'home' %}" class="nav-btn {% if current == 'home' %}active{% endif %}">Inicio</a>
+                <a href="{% url 'communities:list' %}" class="nav-btn {% if current == 'list' or current == 'detail' %}active{% endif %}">Comunidades</a>
+                {% if user.is_authenticated and user.is_community %}
+                <a href="{% url 'communities:my_needs' %}" class="nav-btn {% if current == 'my_needs' %}active{% endif %}">Mis Necesidades</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'donations:my_activity' %}" class="nav-btn {% if current == 'my_activity' %}active{% endif %}">Mi actividad</a>
+                {% endif %}
+                {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="nav-btn nav-btn-admin">Administración</a>
+                {% endif %}
+                {% endwith %}
+            </nav>
+        </div>
+        <div class="navbar-right">
+            <a href="{% url 'donations:start' %}" class="btn btn-brand btn-sm nav-donate">♡ Donar</a>
+            {% if user.is_authenticated %}
+            <div class="user-menu">
+                <div class="user-avatar" aria-hidden="true">{{ user.avatar_initial }}</div>
+                <span class="user-name">{{ user.get_display_name }}</span>
+                <a href="{% url 'accounts:logout' %}" class="logout-link" title="Cerrar sesión">Salir</a>
+            </div>
+            {% else %}
+            <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="logout-link">Ingresar</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+<div id="contenido">
+{% block content %}{% endblock %}
+</div>
+{% include 'includes/footer.html' %}
+{% endblock %}

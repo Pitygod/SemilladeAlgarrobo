@@ -1,0 +1,30 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Donación mensual - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content">
+    <div class="page-header center">
+        <h1>Convertite en donador mensual</h1>
+        <p class="page-subtitle">Con un aporte periódico sostenés el acompañamiento a las comunidades. El débito lo gestiona Mercado Pago y podés cancelarlo cuando quieras desde "Mi actividad".</p>
+    </div>
+
+    <div class="tiers-grid">
+        {% for tier in tiers %}
+        <article class="tier-card {% if tier.is_highlighted %}tier-highlighted{% endif %}">
+            {% if tier.is_highlighted %}<span class="tier-flag">Destacado</span>{% endif %}
+            <h2>{{ tier.name }}</h2>
+            <p class="tier-amount">${{ tier.amount|floatformat:0|intcomma }} <span>/ {{ tier.frequency_label }}</span></p>
+            <p class="tier-desc">{{ tier.description }}</p>
+            {% if tier.purpose %}<p class="tier-purpose">{{ tier.purpose }}</p>{% endif %}
+            <a href="{% url 'donations:subscribe' tier.slug %}" class="btn {% if tier.is_highlighted %}btn-brand{% else %}btn-primary{% endif %} btn-full">Suscribirme</a>
+        </article>
+        {% empty %}
+        <div class="empty-state"><p>Todavía no hay niveles de donador disponibles.</p></div>
+        {% endfor %}
+    </div>
+
+    <p class="help-text center">¿Preferís un aporte por única vez? <a href="{% url 'donations:one_time' %}">Hacé una donación única</a>.</p>
+</main>
+{% endblock %}

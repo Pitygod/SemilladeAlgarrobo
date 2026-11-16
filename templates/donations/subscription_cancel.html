@@ -1,0 +1,19 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Cancelar suscripción - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content page-narrow">
+    <div class="form-card">
+        <h1 class="form-title">¿Cancelar tu suscripción?</h1>
+        <p>Vas a cancelar <strong>{{ subscription.tier_name }}</strong> (${{ subscription.amount|floatformat:0|intcomma }} por mes).
+           Mercado Pago dejará de realizar los débitos. Esta acción no se puede deshacer, pero podés volver a suscribirte cuando quieras.</p>
+        <form method="post" class="result-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Sí, cancelar suscripción</button>
+            <a href="{{ subscription.get_absolute_url }}" class="btn btn-secondary">No, volver</a>
+        </form>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% block body %}{% endblock %}
+
+    <div id="toast-container" class="toast-container">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast toast-show {% if message.level_tag == 'error' %}toast-error{% endif %}" data-auto-dismiss="{% if message.level_tag == 'error' %}9000{% else %}5000{% endif %}" role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}">
+                <span class="toast-icon">{% if message.level_tag == 'error' %}!{% elif message.level_tag == 'info' %}i{% else %}✓{% endif %}</span>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

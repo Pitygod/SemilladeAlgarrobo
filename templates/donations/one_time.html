@@ -1,0 +1,55 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Donación única - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content page-narrow">
+    <a href="{% url 'donations:start' %}{% if need %}?necesidad={{ need.pk }}{% elif community %}?comunidad={{ community.pk }}{% endif %}" class="back-link">← Volver</a>
+
+    <div class="form-card">
+        <div class="form-card-header">
+            <h1 class="form-title">Donación única</h1>
+            {% if need %}
+            <p>Para: <strong>{{ need.title }}</strong> — {{ community.name }}. Faltan ${{ need.remaining_amount|floatformat:0|intcomma }}.</p>
+            {% elif community %}
+            <p>Para: <strong>{{ community.name }}</strong></p>
+            {% else %}
+            <p>Tu aporte acompaña el trabajo de {{ SITE_NAME }} con las comunidades.</p>
+            {% endif %}
+        </div>
+
+        <form method="post" class="donation-form" novalidate>
+            {% csrf_token %}
+            {{ form.community }}
+            {{ form.need }}
+            {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors.0 }}</div>{% endif %}
+
+            <fieldset class="amount-fieldset">
+                <legend>Elegí el importe</legend>
+                <div class="amount-options">
+                    {% for radio in form.amount_choice %}
+                    <label class="amount-option {% if radio.data.value == other_value %}amount-option-other{% endif %}">
+                        {{ radio.tag }}
+                        <span>{{ radio.choice_label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% if form.amount_choice.errors %}<span class="field-error">{{ form.amount_choice.errors.0 }}</span>{% endif %}
+            </fieldset>
+
+            <div class="form-group custom-amount" data-custom-amount>
+                <label for="{{ form.custom_amount.id_for_label }}">{{ form.custom_amount.label }}</label>
+                {{ form.custom_amount }}
+                {% if form.custom_amount.errors %}<span class="field-error">{{ form.custom_amount.errors.0 }}</span>{% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-brand btn-full btn-lg">Continuar a Mercado Pago</button>
+            <p class="help-text center secure-note">
+                🔒 Vas a pagar en el sitio seguro de Mercado Pago. No guardamos datos de tarjetas.
+                Tu donación se confirma cuando Mercado Pago aprueba el pago.
+            </p>
+        </form>
+    </div>
+</main>
+{% endblock %}

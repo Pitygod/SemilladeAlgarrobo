@@ -1,0 +1,72 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Mi actividad solidaria - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content">
+    <div class="page-header">
+        <h1>Mi actividad solidaria</h1>
+        <p class="page-subtitle">Los estados se verifican con Mercado Pago.</p>
+    </div>
+
+    <section class="form-card" aria-labelledby="subs-title">
+        <div class="section-head">
+            <h2 id="subs-title">Suscripciones</h2>
+            <a href="{% url 'donations:monthly' %}" class="btn btn-secondary btn-sm">Ser donador mensual</a>
+        </div>
+        {% if subscriptions %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th scope="col">Tipo de donador</th><th scope="col">Importe</th><th scope="col">Estado</th><th scope="col">Inicio</th><th scope="col">Próximo cobro</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+                <tbody>
+                {% for sub in subscriptions %}
+                <tr>
+                    <td>{{ sub.tier_name }}</td>
+                    <td>${{ sub.amount|floatformat:0|intcomma }}/mes</td>
+                    <td><span class="pill pill-sub-{{ sub.status }}">{{ sub.get_status_display }}</span></td>
+                    <td>{{ sub.started_at|date:"d/m/Y"|default:"—" }}</td>
+                    <td>{{ sub.next_payment_date|date:"d/m/Y"|default:"—" }}</td>
+                    <td class="actions-cell">
+                        <a href="{{ sub.get_absolute_url }}" class="btn btn-outline btn-sm">Ver detalles</a>
+                        {% if sub.can_be_cancelled %}<a href="{% url 'donations:subscription_cancel' sub.reference %}" class="btn btn-outline btn-sm btn-danger-outline">Cancelar</a>{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-inline">Todavía no tenés suscripciones.</p>
+        {% endif %}
+    </section>
+
+    <section class="form-card" aria-labelledby="donations-title">
+        <div class="section-head">
+            <h2 id="donations-title">Donaciones</h2>
+            <a href="{% url 'donations:one_time' %}" class="btn btn-secondary btn-sm">Nueva donación</a>
+        </div>
+        {% if donations %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th scope="col">Fecha</th><th scope="col">Importe</th><th scope="col">Destino</th><th scope="col">Estado</th><th scope="col">ID de operación</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+                <tbody>
+                {% for d in donations %}
+                <tr>
+                    <td>{{ d.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>${{ d.amount|floatformat:0|intcomma }}</td>
+                    <td>{% if d.need %}{{ d.need.title }}{% elif d.community %}{{ d.community.name }}{% else %}General{% endif %}</td>
+                    <td><span class="pill pill-{{ d.status }}">{{ d.get_status_display }}</span></td>
+                    <td><code>{{ d.mp_order_id|default:d.short_reference }}</code></td>
+                    <td class="actions-cell"><a href="{{ d.get_absolute_url }}" class="btn btn-outline btn-sm">Ver detalles</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-inline">Todavía no hiciste donaciones online.</p>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

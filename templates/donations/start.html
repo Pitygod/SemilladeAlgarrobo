@@ -1,0 +1,39 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Quiero ayudar - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content page-narrow">
+    <div class="page-header">
+        <h1>Quiero ayudar</h1>
+        <p class="page-subtitle">
+            {% if need %}Vas a colaborar con <strong>{{ need.title }}</strong> de {{ community.name }}.
+            {% elif community %}Vas a colaborar con <strong>{{ community.name }}</strong>.
+            {% else %}Elegí cómo querés acompañar el trabajo de {{ SITE_NAME }}.{% endif %}
+        </p>
+    </div>
+
+    <div class="choice-grid">
+        <a class="choice-card" href="{% url 'donations:one_time' %}{% if need %}?necesidad={{ need.pk }}{% elif community %}?comunidad={{ community.pk }}{% endif %}">
+            <span class="choice-icon" aria-hidden="true">♡</span>
+            <h2>Donación única</h2>
+            <p>Un aporte por única vez. Elegís el importe y pagás con Mercado Pago.</p>
+            <span class="btn btn-primary btn-full">Donar una vez</span>
+        </a>
+        <a class="choice-card choice-card-accent" href="{% url 'donations:monthly' %}">
+            <span class="choice-icon" aria-hidden="true">↻</span>
+            <h2>Donación mensual</h2>
+            <p>Convertite en donador recurrente{% if tiers %} desde ${{ tiers.0.amount|floatformat:0|intcomma }} por mes{% endif %}. Podés cancelarla cuando quieras.</p>
+            <span class="btn btn-brand btn-full">Ser donador mensual</span>
+        </a>
+    </div>
+
+    {% if community and not need %}
+    <p class="help-text center">Las donaciones mensuales acompañan el trabajo general con todas las comunidades.</p>
+    {% endif %}
+    {% if not user.is_authenticated %}
+    <div class="notice-box notice-info">Para donar te vamos a pedir que ingreses o crees una cuenta, así podés consultar el estado de tus aportes.</div>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}Tu suscripción - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content page-narrow">
+    <a href="{% url 'donations:my_activity' %}" class="back-link">← Mi actividad solidaria</a>
+    {% with s=subscription.status %}
+    <section class="result-card result-sub-{{ s }}" aria-live="polite">
+        <div class="result-icon" aria-hidden="true">{% if s == 'activa' %}✓{% elif s == 'pendiente' or s == 'pausada' %}…{% else %}✕{% endif %}</div>
+        <h1>
+            {% if s == 'activa' %}SUSCRIPCIÓN ACTIVA
+            {% elif s == 'pendiente' %}SUSCRIPCIÓN PENDIENTE
+            {% elif s == 'pausada' %}SUSCRIPCIÓN PAUSADA
+            {% elif s == 'cancelada' %}SUSCRIPCIÓN CANCELADA
+            {% elif s == 'rechazada' %}SUSCRIPCIÓN RECHAZADA
+            {% else %}NO SE PUDO INICIAR LA SUSCRIPCIÓN{% endif %}
+        </h1>
+        <p class="result-message">
+            {% if s == 'activa' %}¡Gracias por ser {{ subscription.tier_name }}! Mercado Pago confirmó la autorización del débito.
+            {% elif s == 'pendiente' %}Todavía no recibimos la autorización de Mercado Pago. Si ya la completaste, puede tardar unos minutos.
+            {% elif s == 'pausada' %}Los cobros están pausados.
+            {% elif s == 'cancelada' %}No se realizarán más cobros.
+            {% elif s == 'error' %}Hubo un problema al conectar con Mercado Pago. No se realizó ningún cobro.
+            {% else %}La suscripción no está activa.{% endif %}
+        </p>
+
+        <dl class="detail-list">
+            <div><dt>Tipo de donador</dt><dd>{{ subscription.tier_name }}</dd></div>
+            <div><dt>Importe</dt><dd>${{ subscription.amount|floatformat:0|intcomma }} {{ subscription.currency }} / {% if subscription.frequency_months == 1 %}mes{% else %}{{ subscription.frequency_months }} meses{% endif %}</dd></div>
+            <div><dt>Estado</dt><dd>{{ subscription.get_status_display }}</dd></div>
+            <div><dt>Fecha de inicio</dt><dd>{% if subscription.started_at %}{{ subscription.started_at|date:"d/m/Y" }}{% else %}—{% endif %}</dd></div>
+            {% if subscription.next_payment_date %}<div><dt>Próximo cobro</dt><dd>{{ subscription.next_payment_date|date:"d/m/Y" }}</dd></div>{% endif %}
+            {% if subscription.cancelled_at %}<div><dt>Cancelada el</dt><dd>{{ subscription.cancelled_at|date:"d/m/Y H:i" }}</dd></div>{% endif %}
+            {% if subscription.mp_preapproval_id %}<div><dt>ID Mercado Pago</dt><dd><code>{{ subscription.mp_preapproval_id }}</code></dd></div>{% endif %}
+            <div><dt>Cuenta de Mercado Pago</dt><dd>{{ subscription.payer_email }}</dd></div>
+        </dl>
+
+        <div class="result-actions">
+            {% if s == 'pendiente' and subscription.init_point %}
+            <a href="{{ subscription.init_point }}" class="btn btn-brand">Completar autorización en Mercado Pago</a>
+            {% endif %}
+            {% if subscription.can_be_cancelled %}
+            <a href="{% url 'donations:subscription_cancel' subscription.reference %}" class="btn btn-outline btn-danger-outline">Cancelar suscripción</a>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if payments %}
+    <section class="form-card">
+        <h2>Cobros registrados</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th scope="col">Fecha</th><th scope="col">Importe</th><th scope="col">Estado</th><th scope="col">ID de pago</th></tr></thead>
+                <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.debit_date|date:"d/m/Y"|default:"—" }}</td>
+                    <td>{% if p.amount %}${{ p.amount|floatformat:0|intcomma }}{% else %}—{% endif %}</td>
+                    <td>{{ p.payment_status|default:p.status|default:"—" }}</td>
+                    <td><code>{{ p.mp_payment_id|default:"—" }}</code></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+</main>
+{% endblock %}

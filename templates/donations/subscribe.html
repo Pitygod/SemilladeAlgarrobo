@@ -1,0 +1,35 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}{{ tier.name }} - {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<main class="page-content page-narrow">
+    <a href="{% url 'donations:monthly' %}" class="back-link">← Ver todos los niveles</a>
+    <div class="form-card">
+        <div class="form-card-header">
+            <h1 class="form-title">{{ tier.name }}</h1>
+            <p class="tier-amount">${{ tier.amount|floatformat:0|intcomma }} <span>/ {{ tier.frequency_label }}</span></p>
+            <p>{{ tier.description }}</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.payer_email.id_for_label }}">{{ form.payer_email.label }}</label>
+                {{ form.payer_email }}
+                <p class="help-text">{{ form.payer_email.help_text }}</p>
+                {% if form.payer_email.errors %}<span class="field-error">{{ form.payer_email.errors.0 }}</span>{% endif %}
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    {{ form.accept }} {{ form.accept.label }}
+                </label>
+                {% if form.accept.errors %}<span class="field-error">Necesitamos tu confirmación para continuar.</span>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-brand btn-full btn-lg">Autorizar en Mercado Pago</button>
+            <p class="help-text center secure-note">🔒 Vas a autorizar el débito en el sitio de Mercado Pago. No guardamos datos de tarjetas.</p>
+        </form>
+    </div>
+</main>
+{% endblock %}

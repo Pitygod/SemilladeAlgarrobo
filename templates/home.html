@@ -1,0 +1,129 @@
+{% extends 'includes/navbar.html' %}
+{% load humanize %}
+
+{% block title %}{{ SITE_NAME }} - Comunidades que necesitan tu ayuda{% endblock %}
+
+{% block content %}
+<main>
+    {% if featured %}
+    <section class="featured-hero" aria-labelledby="featured-title">
+        <div class="featured-inner">
+            <div class="featured-media">
+                <img src="{{ featured.get_image }}" alt="{% if featured.main_image %}{{ featured.main_image.alt_text }}{% else %}Foto de {{ featured.name }}{% endif %}"
+                     class="featured-image" fetchpriority="high">
+                {% with photos=featured.gallery %}
+                {% if photos|length > 1 %}
+                <span class="photo-count">{{ photos|length }} fotos</span>
+                {% endif %}
+                {% endwith %}
+            </div>
+            <div class="featured-body">
+                <p class="eyebrow">
+                    {% if featured.priority_score > 0 %}La comunidad que más necesita tu ayuda{% else %}Comunidad destacada{% endif %}
+                </p>
+                <h1 id="featured-title">{{ featured.name }}</h1>
+                <p class="featured-location">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ featured.location_label }}
+                </p>
+                <p class="featured-desc">{{ featured.description|truncatewords:40 }}</p>
+
+                {% if featured.top_needs %}
+                <h2 class="featured-subtitle">Necesidades principales</h2>
+                <ul class="need-chips">
+                    {% for need in featured.top_categories|slice:":6" %}
+                    {% with st=need.public_status %}
+                    <li class="need-chip need-chip-{{ st.0 }}">
+                        <span class="status-dot status-{{ st.0 }}" aria-hidden="true"></span>
+                        {{ need.category }}{% if need.is_urgent %} · urgente{% endif %}
+                    </li>
+                    {% endwith %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <div class="featured-actions">
+                    <a href="{% url 'communities:detail' featured.pk %}" class="btn btn-primary btn-lg">Conocer comunidad</a>
+                    <a href="{% url 'donations:start' %}?comunidad={{ featured.pk }}" class="btn btn-brand btn-lg">♡ Quiero ayudar</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% else %}
+    <section class="featured-hero">
+        <div class="featured-inner featured-empty">
+            <h1>Comunidades que necesitan tu ayuda</h1>
+            <p>Pronto vas a poder conocer las comunidades que acompañamos.</p>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if others %}
+    <section class="page-content home-section" aria-labelledby="others-title">
+        <div class="section-head">
+            <div>
+                <h2 id="others-title">Otras comunidades que podés acompañar</h2>
+                <p class="page-subtitle">Ordenadas según sus necesidades activas.</p>
+            </div>
+            <div class="carousel-controls" data-carousel-controls="communities-carousel">
+                <button type="button" class="carousel-btn" data-dir="-1" aria-label="Comunidades anteriores">‹</button>
+                <button type="button" class="carousel-btn" data-dir="1" aria-label="Comunidades siguientes">›</button>
+            </div>
+        </div>
+        <div class="carousel" id="communities-carousel" tabindex="0" aria-label="Carrusel de comunidades">
+            {% for community in others %}
+            <article class="community-card carousel-item">
+                <div class="card-image-wrap">
+                    <img src="{{ community.get_image }}" alt="Foto de {{ community.name }}" class="card-image" loading="lazy">
+                    <span class="location-badge">{{ community.province }}</span>
+                </div>
+                <div class="card-body">
+                    <h3>{{ community.name }}</h3>
+                    {% if community.top_needs %}
+                    <ul class="need-chips need-chips-sm">
+                        {% for need in community.top_categories|slice:":3" %}
+                        {% with st=need.public_status %}
+                        <li class="need-chip need-chip-{{ st.0 }}"><span class="status-dot status-{{ st.0 }}" aria-hidden="true"></span>{{ need.category }}</li>
+                        {% endwith %}
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="card-desc">{{ community.description|truncatewords:14 }}</p>
+                    {% endif %}
+                    <a href="{% url 'communities:detail' community.pk %}" class="btn btn-primary btn-full">Conocer comunidad</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <p class="section-more"><a href="{% url 'communities:list' %}">Ver todas las comunidades →</a></p>
+    </section>
+    {% endif %}
+
+    <section class="help-options" aria-labelledby="help-title">
+        <div class="page-content">
+            <h2 id="help-title">¿Cómo querés ayudar?</h2>
+            <div class="help-grid">
+                <article class="help-card">
+                    <h3>Donación única</h3>
+                    <p>Hacé un aporte por única vez, con el importe que elijas.</p>
+                    <a href="{% url 'donations:one_time' %}" class="btn btn-primary">Donar una vez</a>
+                </article>
+                <article class="help-card help-card-accent">
+                    <h3>Donación mensual</h3>
+                    <p>Convertite en donador recurrente y sostené el trabajo comunitario mes a mes.</p>
+                    {% if tiers %}
+                    <p class="help-tiers">Desde <strong>${{ tiers.0.amount|floatformat:0|intcomma }}</strong> por mes · {{ tiers|length }} niveles</p>
+                    {% endif %}
+                    <a href="{% url 'donations:monthly' %}" class="btn btn-brand">Ser donador mensual</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="social-section page-content" aria-labelledby="social-title">
+        <h2 id="social-title">Seguinos en nuestras redes</h2>
+        <p class="page-subtitle">Compartimos el día a día del trabajo con las comunidades.</p>
+        {% include 'includes/social_buttons.html' with variant='large' %}
+    </section>
+</main>
+{% endblock %}
